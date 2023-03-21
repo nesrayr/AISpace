@@ -1,0 +1,13 @@
+<div class="container flex">
+    {{if .Article}}
+    <div class="content">
+        <p>{{ .Article.Title }}</p>
+        <p>{{ .Article.Description }}</p>
+    </div>
+
+    <div class="actions">
+        <a href="/article/{{ .Article.ID }}/edit" class="btn-secondary">Edit</a>
+        <button id="delete-button" data-articleid="{{ .Article.ID }}" class="btn-danger">Delete</button>
+    </div>
+    {{end}}
+</div>

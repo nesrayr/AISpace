@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" name="viewport" content="width=device-width,initial-scale=1">
+    <title>AISpace</title>
+</head>
+<body>
+
+<div class="wrapper">
+    <!--        <h1>{{ .Title }}</h1>-->
+    {{embed}}
+</div>
+
+
+</body>
+</html>
+
+<script id="main" src="/javascript/app.js"></script>
+
+<script>
+    const timeStamp = Date.now()
+    const appScriptLink = document.querySelector("script#main")
+    appScriptLink.src += `?t=${timeStamp}`
+</script>

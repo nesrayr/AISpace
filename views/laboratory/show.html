@@ -1,0 +1,11 @@
+<div class="container flex">
+  {{if .Laboratory }}
+  <div class="content">
+    <p>{{ .Laboratory.Info }}</p>
+  </div>
+
+  <div class="actions">
+    <a href="/laboratory/{{ .Laboratory.ID }}/edit" class="btn-secondary">Edit</a>
+  </div>
+  {{end}}
+</div>

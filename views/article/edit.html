@@ -1,0 +1,14 @@
+<div class="container">
+  <form id="form-update-article" data-articleid="{{ .Article.ID }}">
+    <label for="title">
+      <span>Title</span>
+      <input id="title" type="text" name="title" value="{{ .Article.Title }}">
+    </label>
+    <label for="description">
+      <span>Description</span>
+      <input id="description" type="text" name="description" value="{{ .Article.Description }}">
+    </label>
+
+    <input type="submit" value="Update">
+  </form>
+</div>

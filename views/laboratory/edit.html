@@ -1,0 +1,10 @@
+<div class="container">
+  <form id="form-update-laboratory" data-laboratoryid="{{ .Laboratory.ID }}">
+    <label for="info">
+      <span>Info</span>
+      <input id="info" type="text" name="info" value="{{ .Laboratory.Info }}">
+    </label>
+
+    <input type="submit" value="Update">
+  </form>
+</div>
