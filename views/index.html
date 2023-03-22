@@ -86,9 +86,18 @@
                     {{ if .Articles }}
                     {{ range .Articles }}
                     <div>
-                        <p>{{ .Title }}</p>
+                        {{ if eq .ID 1}}
+                        <a href="/article/{{ .ID }}">
+                        <div class="title-wrapper">
+                            <p class="title">{{ .Title }}</p>
+                            <div class="actions">
+                                {{template "icon-arrow-right" .}}
+                            </div>
+                        </div>
+                        </a>
                         <p>{{ .Description }}</p>
                         <p>{{ .Edited }}</p>
+                        {{ end }}
                     </div>
                     {{ end }}
                     {{ else }}
@@ -102,9 +111,47 @@
             </div>
             <div class="carousel-item">
                 <img src="/img/card__img.svg" class="d-block w-100" alt="...">
+                <div class="carousel-item-text">
+                    {{ range .Articles }}
+                    <div>
+                        {{ if eq .ID 2}}
+                        <a href="/article/{{ .ID }}">
+                            <div class="title-wrapper">
+                                <p class="title">{{ .Title }}</p>
+                                <div class="actions">
+                                    {{template "icon-arrow-right" .}}
+                                </div>
+                            </div>
+                        </a>
+                        <p>{{ .Description }}</p>
+                        <p>{{ .Edited }}</p>
+                        {{ end }}
+                    </div>
+                    {{ end }}
+                </div>
+                </img>
             </div>
             <div class="carousel-item">
                 <img src="/img/card__img.svg" class="d-block w-100" alt="...">
+                <div class="carousel-item-text">
+                    {{ range .Articles }}
+                    <div>
+                        {{ if eq .ID 3}}
+                        <a href="/article/{{ .ID }}">
+                            <div class="title-wrapper">
+                                <p class="title">{{ .Title }}</p>
+                                <div class="actions">
+                                    {{template "icon-arrow-right" .}}
+                                </div>
+                            </div>
+                        </a>
+                        <p>{{ .Description }}</p>
+                        <p>{{ .Edited }}</p>
+                        {{ end }}
+                    </div>
+                    {{ end }}
+                </div>
+                </img>
             </div>
         </div>
         <button class="carousel-control-prev carousel-control" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
@@ -125,7 +172,17 @@
             </h3>
             <div class="partners__list">
                 <div class="partners__list__partner">
-                    <img src="/img/1920px-Sberbank_Logo_2020 1.svg" alt="СберБанк">
+                    {{ range .Logos }}
+                    <svg width="444" height="68" viewBox="0 0 444 68" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                        <rect width="444" height="68" fill="url(#pattern0)"/>
+                        <defs>
+                            <pattern id="pattern0" patternContentUnits="objectBoundingBox" width="1" height="1">
+                                <use xlink:href="#image0_80_103" transform="matrix(0.000520833 0 0 0.00340074 0 -0.013511)"/>
+                            </pattern>
+                            <image id="image0_80_103" width="1920" height="302" xlink:href="data:image/png;base64, {{ .StrData }}"/>
+                        </defs>
+                    </svg>
+                    {{ end }}
                 </div>
                 <div class="partners__list__partner">
                     <img src="/img/1920px-Sberbank_Logo_2020 1.svg" alt="СберБанк">

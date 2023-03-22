@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/base64"
 	"github.com/gofiber/fiber/v2"
 	"github.com/nesrayr/database"
 	"github.com/nesrayr/models"
@@ -10,15 +11,15 @@ import (
 func Home(c *fiber.Ctx) error {
 	laboratories := []models.Laboratory{}
 	articles := []models.Article{}
+	logos := []models.Logo{}
 	database.DB.Db.Find(&laboratories)
 	database.DB.Db.Find(&articles)
+	database.DB.Db.Find(&logos)
 
 	return c.Render("index", fiber.Map{
-		"Title":        "AISpace",
-		"Subtitle1":    "Лаборатория",
-		"Subtitle2":    "Статьи",
 		"Laboratories": laboratories,
 		"Articles":     articles,
+		"Logos":        logos,
 	})
 }
 
@@ -168,6 +169,45 @@ func DeleteArticle(c *fiber.Ctx) error {
 	}
 
 	return Home(c)
+}
+
+func CreateImage(c *fiber.Ctx) error {
+	image := new(models.Photo)
+	if err := c.BodyParser(image); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": err.Error(),
+		})
+	}
+
+	database.DB.Db.Create(&image)
+
+	return c.Status(200).JSON(image)
+}
+
+func GetImage(c *fiber.Ctx) error {
+	images := []models.Photo{}
+	database.DB.Db.Find(&images)
+
+	return c.Status(200).JSON(images)
+}
+
+func CreateLogo(c *fiber.Ctx) error {
+	logo := new(models.Logo)
+	if err := c.BodyParser(logo); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": err.Error(),
+		})
+	}
+	logo.StrData = base64.StdEncoding.EncodeToString(logo.Data)
+	database.DB.Db.Create(&logo)
+	return c.Status(200).JSON(logo)
+}
+
+func GetLogo(c *fiber.Ctx) error {
+	logos := []models.Logo{}
+	database.DB.Db.Find(&logos)
+
+	return c.Status(200).JSON(logos)
 }
 
 func NotFound(c *fiber.Ctx) error {

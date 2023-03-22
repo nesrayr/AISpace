@@ -18,4 +18,10 @@ func setupRoutes(app *fiber.App) {
 	app.Get("/laboratory/:id/edit", handlers.EditLaboratory)
 	app.Patch("/laboratory/:id", handlers.UpdateLaboratory)
 	app.Delete("/article/:id", handlers.DeleteArticle)
+
+	app.Post("/image/new", handlers.CreateImage)
+	app.Get("/image", handlers.GetImage)
+	app.Post("/logo/new", handlers.CreateLogo)
+	app.Get("/logo", handlers.GetLogo)
+
 }
