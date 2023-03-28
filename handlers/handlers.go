@@ -63,16 +63,22 @@ func CreateArticle(c *fiber.Ctx) error {
 
 func ShowArticle(c *fiber.Ctx) error {
 	article := models.Article{}
+	photos := []models.Photo{}
 	id := c.Params("id")
 
 	result := database.DB.Db.Where("id=?", id).First(&article)
 	if result.Error != nil {
 		return NotFound(c)
 	}
+	images := database.DB.Db.Where("article_id=?", id).Find(&photos)
+	if images.Error != nil {
+		return NotFound(c)
+	}
 
 	return c.Render("article/show", fiber.Map{
 		"Title":   "Article",
 		"Article": article,
+		"Photos":  photos,
 	})
 }
 
@@ -179,6 +185,7 @@ func CreateImage(c *fiber.Ctx) error {
 		})
 	}
 
+	image.StrData = base64.StdEncoding.EncodeToString(image.Data)
 	database.DB.Db.Create(&image)
 
 	return c.Status(200).JSON(image)
@@ -208,6 +215,38 @@ func GetLogo(c *fiber.Ctx) error {
 	database.DB.Db.Find(&logos)
 
 	return c.Status(200).JSON(logos)
+}
+
+func DeleteLogo(c *fiber.Ctx) error {
+	logo := new(models.Logo)
+	id := c.Params("id")
+
+	result := database.DB.Db.Where("id=?", id).Delete(&logo)
+	if result.Error != nil {
+		c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "Not found",
+		})
+	}
+
+	return c.Status(200).JSON(fiber.Map{
+		"message": "Success",
+	})
+}
+
+func DeleteImage(c *fiber.Ctx) error {
+	image := new(models.Photo)
+	id := c.Params("id")
+
+	result := database.DB.Db.Where("id=?", id).Delete(&image)
+	if result.Error != nil {
+		c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "Not found",
+		})
+	}
+
+	return c.Status(200).JSON(fiber.Map{
+		"message": "Success",
+	})
 }
 
 func NotFound(c *fiber.Ctx) error {

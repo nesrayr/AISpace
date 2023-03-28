@@ -171,28 +171,11 @@
                 Партнеры
             </h3>
             <div class="partners__list">
+                {{ range .Logos }}
                 <div class="partners__list__partner">
-                    {{ range .Logos }}
-                    <svg width="444" height="68" viewBox="0 0 444 68" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-                        <rect width="444" height="68" fill="url(#pattern0)"/>
-                        <defs>
-                            <pattern id="pattern0" patternContentUnits="objectBoundingBox" width="1" height="1">
-                                <use xlink:href="#image0_80_103" transform="matrix(0.000520833 0 0 0.00340074 0 -0.013511)"/>
-                            </pattern>
-                            <image id="image0_80_103" width="1920" height="302" xlink:href="data:image/png;base64, {{ .StrData }}"/>
-                        </defs>
-                    </svg>
-                    {{ end }}
+                    <img src="data:image/png;base64, {{ .StrData }}" width="400" height="300" alt="{{ .Filename }}">
                 </div>
-                <div class="partners__list__partner">
-                    <img src="/img/1920px-Sberbank_Logo_2020 1.svg" alt="СберБанк">
-                </div>
-                <div class="partners__list__partner">
-                    <img src="/img/1920px-Sberbank_Logo_2020 1.svg" alt="СберБанк">
-                </div>
-                <div class="partners__list__partner">
-                    <img src="/img/1920px-Sberbank_Logo_2020 1.svg" alt="СберБанк">
-                </div>
+                {{ end }}
             </div>
         </div>
     </div>

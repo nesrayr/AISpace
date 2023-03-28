@@ -23,5 +23,7 @@ func setupRoutes(app *fiber.App) {
 	app.Get("/image", handlers.GetImage)
 	app.Post("/logo/new", handlers.CreateLogo)
 	app.Get("/logo", handlers.GetLogo)
+	app.Delete("/logo/:id", handlers.DeleteLogo)
+	app.Delete("/image/:id", handlers.DeleteImage)
 
 }

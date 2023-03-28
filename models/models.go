@@ -13,17 +13,18 @@ type Laboratory struct {
 
 type Article struct {
 	gorm.Model
-	ID          int    `gorm:"type:uuid;primary_key;"`
 	Title       string `json:"title" gorm:"text;not null;default:null"`
 	Description string `json:"description" gorm:"text;not null;default:null"`
 	Edited      time.Time
-	//Url         string `json:"url"`
+	Photos      []Photo
 }
 
 type Photo struct {
 	gorm.Model
-	Data     []byte `json:"data"`
-	Filename string `json:"filename"`
+	Data      []byte `json:"data"`
+	StrData   string `json:"strdata"`
+	Filename  string `json:"filename"`
+	ArticleID int    `json:"article_id,string,omitempty"`
 }
 
 type Logo struct {

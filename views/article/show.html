@@ -3,6 +3,9 @@
     <div class="content">
         <p>{{ .Article.Title }}</p>
         <p>{{ .Article.Description }}</p>
+        {{range .Photos }}
+        <img src="data:image/jpeg;base64, {{ .StrData }}" width="400" height="300" alt="{{ .Filename }}">
+        {{ end }}
     </div>
 
     <div class="actions">
