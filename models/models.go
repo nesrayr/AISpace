@@ -33,3 +33,8 @@ type Logo struct {
 	Data     []byte `json:"data"`
 	Filename string `json:"filename"`
 }
+
+type User struct {
+	gorm.Model
+	Email string `json:"email"`
+}

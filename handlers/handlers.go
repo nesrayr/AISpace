@@ -1,11 +1,39 @@
 package handlers
 
 import (
+	"context"
 	"encoding/base64"
+	"encoding/json"
 	"github.com/gofiber/fiber/v2"
 	"github.com/nesrayr/database"
 	"github.com/nesrayr/models"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/google"
+	"os"
 	"time"
+)
+
+type GoogleUserInfo struct {
+	Sub           string `json:"sub"`
+	Name          string `json:"name"`
+	GivenName     string `json:"given_name"`
+	FamilyName    string `json:"family_name"`
+	Picture       string `json:"picture"`
+	Email         string `json:"email"`
+	EmailVerified bool   `json:"email_verified"`
+}
+
+var (
+	oauth2Config = &oauth2.Config{
+		ClientID:     os.Getenv("CLIENT_ID"),
+		ClientSecret: os.Getenv("CLIENT_SECRET"),
+		RedirectURL:  "http://localhost:3000/auth/google/callback",
+		Scopes: []string{
+			"https://www.googleapis.com/auth/userinfo.profile",
+			"https://www.googleapis.com/auth/userinfo.email",
+		},
+		Endpoint: google.Endpoint,
+	}
 )
 
 func Home(c *fiber.Ctx) error {
@@ -21,6 +49,52 @@ func Home(c *fiber.Ctx) error {
 		"Articles":     articles,
 		"Logos":        logos,
 	})
+}
+
+func AuthMain(c *fiber.Ctx) error {
+	url := oauth2Config.AuthCodeURL("state", oauth2.AccessTypeOffline)
+	return c.Redirect(url)
+}
+
+func AuthHome(c *fiber.Ctx) error {
+	laboratories := []models.Laboratory{}
+	articles := []models.Article{}
+	logos := []models.Logo{}
+	database.DB.Db.Find(&laboratories)
+	database.DB.Db.Find(&articles)
+	database.DB.Db.Find(&logos)
+
+	return c.Render("auth_index", fiber.Map{
+		"Laboratories": laboratories,
+		"Articles":     articles,
+		"Logos":        logos,
+	})
+}
+
+func AuthCallback(c *fiber.Ctx) error {
+	code := c.Query("code")
+	token, err := oauth2Config.Exchange(context.Background(), code)
+	if err != nil {
+		return err
+	}
+	client := oauth2Config.Client(context.Background(), token)
+	resp, err := client.Get("https://www.googleapis.com/oauth2/v3/userinfo")
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	var userInfo GoogleUserInfo
+	if err := json.NewDecoder(resp.Body).Decode(&userInfo); err != nil {
+		return err
+	}
+
+	user := []models.User{}
+	res := database.DB.Db.Where("email=?", userInfo.Email).First(&user)
+	if res.Error != nil {
+		return NotFound(c)
+	}
+	return AuthHome(c)
 }
 
 func NewLaboratoryView(c *fiber.Ctx) error {
@@ -76,6 +150,27 @@ func ShowArticle(c *fiber.Ctx) error {
 	}
 
 	return c.Render("article/show", fiber.Map{
+		"Title":   "Article",
+		"Article": article,
+		"Photos":  photos,
+	})
+}
+
+func AuthShowArticle(c *fiber.Ctx) error {
+	article := models.Article{}
+	photos := []models.Photo{}
+	id := c.Params("id")
+
+	result := database.DB.Db.Where("id=?", id).First(&article)
+	if result.Error != nil {
+		return NotFound(c)
+	}
+	images := database.DB.Db.Where("article_id=?", id).Find(&photos)
+	if images.Error != nil {
+		return NotFound(c)
+	}
+
+	return c.Render("article/auth_show", fiber.Map{
 		"Title":   "Article",
 		"Article": article,
 		"Photos":  photos,
@@ -238,6 +333,42 @@ func DeleteImage(c *fiber.Ctx) error {
 	id := c.Params("id")
 
 	result := database.DB.Db.Where("id=?", id).Delete(&image)
+	if result.Error != nil {
+		c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "Not found",
+		})
+	}
+
+	return c.Status(200).JSON(fiber.Map{
+		"message": "Success",
+	})
+}
+
+func CreateUser(c *fiber.Ctx) error {
+	user := new(models.User)
+	if err := c.BodyParser(user); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": err.Error(),
+		})
+	}
+
+	database.DB.Db.Create(&user)
+
+	return c.Status(200).JSON(user)
+}
+
+func GetUser(c *fiber.Ctx) error {
+	users := []models.User{}
+	database.DB.Db.Find(&users)
+
+	return c.Status(200).JSON(users)
+}
+
+func DeleteUser(c *fiber.Ctx) error {
+	user := new(models.User)
+	id := c.Params("id")
+
+	result := database.DB.Db.Where("id=?", id).Delete(&user)
 	if result.Error != nil {
 		c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": "Not found",
