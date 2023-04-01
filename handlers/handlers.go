@@ -92,7 +92,7 @@ func AuthCallback(c *fiber.Ctx) error {
 	user := []models.User{}
 	res := database.DB.Db.Where("email=?", userInfo.Email).First(&user)
 	if res.Error != nil {
-		return NotFound(c)
+		return NotModerator(c)
 	}
 	return AuthHome(c)
 }
@@ -382,4 +382,8 @@ func DeleteUser(c *fiber.Ctx) error {
 
 func NotFound(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusNotFound).SendFile("views/404.html")
+}
+
+func NotModerator(c *fiber.Ctx) error {
+	return c.Status(fiber.StatusNotFound).SendFile("views/not_moderator.html")
 }
