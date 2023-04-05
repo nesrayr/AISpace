@@ -8,7 +8,7 @@ import (
 
 func main() {
 	database.ConnectDB()
-	//database.DB.Db.Exec("TRUNCATE TABLE photos RESTART IDENTITY ")
+	//database.DB.Db.Exec("DROP TABLE moderators")
 	engine := html.New("./views", ".html")
 	app := fiber.New(fiber.Config{
 		Views:       engine,

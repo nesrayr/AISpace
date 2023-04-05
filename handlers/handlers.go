@@ -4,11 +4,13 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gofiber/fiber/v2"
 	"github.com/nesrayr/database"
 	"github.com/nesrayr/models"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
+	"net/http"
 	"os"
 	"time"
 )
@@ -73,28 +75,75 @@ func AuthHome(c *fiber.Ctx) error {
 
 func AuthCallback(c *fiber.Ctx) error {
 	code := c.Query("code")
+	if code == "" {
+		return fiber.NewError(http.StatusBadRequest, "Missing authorization code")
+	}
 	token, err := oauth2Config.Exchange(context.Background(), code)
+	if err != nil {
+		return fiber.NewError(http.StatusBadRequest, "Failed to exchange code for token")
+	}
+	if err := database.DB.RedisClient.Set(context.Background(), "refresh_token", token.RefreshToken,
+		time.Duration(time.Now().Add(time.Hour*24*3).Unix())).Err(); err != nil {
+		return fiber.NewError(http.StatusBadRequest, "Failed to save refresh token to Redis")
+	}
+	jwtToken, err := generateJWT(token)
 	if err != nil {
 		return err
 	}
+	return c.JSON(fiber.Map{
+		"token": jwtToken,
+	})
+}
+
+type Claims struct {
+	Sub       string `json:"sub"`
+	Username  string `json:"username"`
+	IssuedAt  int64  `json:"iat"`
+	ExpiresAt int64  `json:"exp"`
+	Role      string `json:"role"`
+}
+
+func (c Claims) Valid() error {
+	if c.ExpiresAt < time.Now().Unix() {
+		return jwt.ErrSignatureInvalid
+	}
+	return nil
+}
+
+func generateJWT(token *oauth2.Token) (string, error) {
 	client := oauth2Config.Client(context.Background(), token)
 	resp, err := client.Get("https://www.googleapis.com/oauth2/v3/userinfo")
 	if err != nil {
-		return err
+		return "", err
 	}
 	defer resp.Body.Close()
 
 	var userInfo GoogleUserInfo
 	if err := json.NewDecoder(resp.Body).Decode(&userInfo); err != nil {
-		return err
+		return "", err
+	}
+	users := []models.User{}
+	var role string
+	res := database.DB.Db.Where("email=?", userInfo.Email).First(&users)
+	if res.Error != nil {
+		role = "User"
+	} else {
+		role = users[0].Role
 	}
 
-	user := []models.User{}
-	res := database.DB.Db.Where("email=?", userInfo.Email).First(&user)
-	if res.Error != nil {
-		return NotModerator(c)
+	claims := &Claims{
+		Sub:       userInfo.Sub,
+		Username:  userInfo.Name,
+		IssuedAt:  time.Now().Unix(),
+		ExpiresAt: time.Now().Add(time.Hour * 24 * 3).Unix(),
+		Role:      role,
 	}
-	return AuthHome(c)
+	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	signedToken, err := jwtToken.SignedString([]byte(os.Getenv("CLIENT_SECRET")))
+	if err != nil {
+		return "", err
+	}
+	return signedToken, nil
 }
 
 func NewLaboratoryView(c *fiber.Ctx) error {
@@ -344,27 +393,25 @@ func DeleteImage(c *fiber.Ctx) error {
 	})
 }
 
-func CreateUser(c *fiber.Ctx) error {
-	user := new(models.User)
-	if err := c.BodyParser(user); err != nil {
+func CreateAdmin(c *fiber.Ctx) error {
+	admin := new(models.User)
+	if err := c.BodyParser(admin); err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": err.Error(),
 		})
 	}
-
-	database.DB.Db.Create(&user)
-
-	return c.Status(200).JSON(user)
+	database.DB.Db.Create(&admin)
+	return c.Status(200).JSON(admin)
 }
 
-func GetUser(c *fiber.Ctx) error {
+func GetAdmin(c *fiber.Ctx) error {
 	users := []models.User{}
 	database.DB.Db.Find(&users)
 
 	return c.Status(200).JSON(users)
 }
 
-func DeleteUser(c *fiber.Ctx) error {
+func DeleteAdmin(c *fiber.Ctx) error {
 	user := new(models.User)
 	id := c.Params("id")
 

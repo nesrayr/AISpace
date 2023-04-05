@@ -1,7 +1,9 @@
 package database
 
 import (
+	"context"
 	"fmt"
+	"github.com/go-redis/redis/v8"
 	"github.com/nesrayr/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -11,12 +13,14 @@ import (
 )
 
 type DBInstance struct {
-	Db *gorm.DB
+	Db          *gorm.DB
+	RedisClient *redis.Client
 }
 
 var DB DBInstance
 
 func ConnectDB() {
+	// Postgres
 	dsn := fmt.Sprintf(
 		"host=db user=%s password=%s dbname=%s port=5432 sslmode=disable",
 		os.Getenv("DB_USER"),
@@ -36,5 +40,23 @@ func ConnectDB() {
 
 	log.Println("Running migrations")
 	db.AutoMigrate(&models.Laboratory{}, &models.Article{}, &models.Photo{}, &models.Logo{}, &models.User{})
-	DB = DBInstance{db}
+
+	//Redis
+	redisHost := os.Getenv("REDIS_HOST")
+	redisPort := os.Getenv("REDIS_PORT")
+
+	log.Println("Connecting to Redis")
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     fmt.Sprintf("%s:%s", redisHost, redisPort),
+		Password: "",
+		DB:       0,
+	})
+
+	_, err = rdb.Ping(context.Background()).Result()
+	if err != nil {
+		log.Fatal("Failed to connect to redis\n", err)
+		os.Exit(2)
+	}
+
+	DB = DBInstance{db, rdb}
 }

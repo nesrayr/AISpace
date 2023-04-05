@@ -27,9 +27,9 @@ func setupRoutes(app *fiber.App) {
 	app.Get("/logo", handlers.GetLogo)
 	app.Delete("/logo/:id", handlers.DeleteLogo)
 	app.Delete("/image/:id", handlers.DeleteImage)
-	app.Post("/user/new", handlers.CreateUser)
-	app.Get("/user", handlers.GetUser)
-	app.Delete("/user/:id", handlers.DeleteUser)
+	app.Post("/user/new", handlers.CreateAdmin)
+	app.Get("/user", handlers.GetAdmin)
+	app.Delete("/user/:id", handlers.DeleteAdmin)
 
 	app.Get("/auth", handlers.AuthMain)
 	app.Get("/auth/google/callback", handlers.AuthCallback)

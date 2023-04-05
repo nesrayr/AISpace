@@ -37,4 +37,5 @@ type Logo struct {
 type User struct {
 	gorm.Model
 	Email string `json:"email"`
+	Role  string `json:"role"`
 }
