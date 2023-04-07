@@ -7,5 +7,12 @@
         <img src="data:image/jpeg;base64, {{ .StrData }}" width="400" height="300" alt="{{ .Filename }}">
         {{ end }}
     </div>
-    {{end}}
+
+    {{ if eq .Role "Admin" }}
+    <div class="actions">
+        <a href="/article/{{ .Article.ID }}/edit" class="btn-secondary">Edit</a>
+        <button id="delete-button" data-articleid="{{ .Article.ID }}" class="btn-danger">Delete</button>
+    </div>
+    {{ end }}
+    {{ end }}
 </div>

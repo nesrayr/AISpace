@@ -52,10 +52,25 @@
             <div class="laboratory__text">
                 <div>
                     {{ if .Laboratories }}
+                    {{ if eq .Role "Admin" }}
+                    {{ range .Laboratories }}
+                    <div>
+                        <a href="/laboratory/{{ .ID }}">
+                            <div class="title-wrapper">
+                                <p class="info">{{ .Info }}</p>
+                                <div class="actions">
+                                    {{template "icon-arrow-right" .}}
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    {{ end }}
+                    {{ else }}
                     {{ range .Laboratories }}
                     <div>
                         <p>{{ .Info }}</p>
                     </div>
+                    {{ end }}
                     {{ end }}
                     {{ else }}
                     <div>
@@ -88,12 +103,12 @@
                     <div>
                         {{ if eq .ID 1}}
                         <a href="/article/{{ .ID }}">
-                        <div class="title-wrapper">
-                            <p class="title">{{ .Title }}</p>
-                            <div class="actions">
-                                {{template "icon-arrow-right" .}}
+                            <div class="title-wrapper">
+                                <p class="title">{{ .Title }}</p>
+                                <div class="actions">
+                                    {{template "icon-arrow-right" .}}
+                                </div>
                             </div>
-                        </div>
                         </a>
                         <p>{{ .Description }}</p>
                         <p>{{ .Edited }}</p>
@@ -221,9 +236,6 @@
                         <i class="fa-brands fa-tiktok"></i>
                     </a>
                 </li>
-                <!-- <li>
-                    <a href="" class="footer__rutube footer__links__element"></a>
-                </li> -->
                 <li>
                     <a href="#" class="footer__odnoklassniki footer__links__element">
                         <i class="fa-brands fa-odnoklassniki"></i>
@@ -239,14 +251,3 @@
 </body>
 </html>
 
-<!-- <div class="articles__cards">
-    <div class="card">
-
-    </div>
-    <div class="card">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque semper mollis leo non dignissim. Duis volutpat ultricies mi, a luctus eros aliquet ut. Aenean ligula risus, dapibus quis odio id, posuere ornare arcu.
-    </div>
-    <div class="card">
-
-    </div>
-</div> -->

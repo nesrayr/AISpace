@@ -3,16 +3,14 @@ package main
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/nesrayr/handlers"
+	"github.com/nesrayr/middleware"
 )
 
 func setupRoutes(app *fiber.App) {
-	app.Get("/", handlers.Home)
-	app.Get("/", handlers.AuthHome)
 	app.Get("/laboratory/new", handlers.NewLaboratoryView)
 	app.Get("/article/new", handlers.NewArticleView)
 	app.Post("/laboratory", handlers.CreateLaboratory)
 	app.Post("/article", handlers.CreateArticle)
-	app.Get("/article/:id", handlers.ShowArticle)
 	app.Get("/article/auth/:id", handlers.AuthShowArticle)
 	app.Get("/laboratory/:id", handlers.ShowLaboratory)
 	app.Get("/article/:id/edit", handlers.EditArticle)
@@ -33,4 +31,9 @@ func setupRoutes(app *fiber.App) {
 
 	app.Get("/auth", handlers.AuthMain)
 	app.Get("/auth/google/callback", handlers.AuthCallback)
+	app.Use(middleware.AuthMiddleware())
+	app.Get("/", handlers.Home)
+	app.Get("/article/:id", handlers.ShowArticle)
+	//app.Get("/", handlers.AuthHome)
+
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gofiber/fiber/v2"
 	"github.com/nesrayr/database"
@@ -39,17 +40,25 @@ var (
 )
 
 func Home(c *fiber.Ctx) error {
+	var role string
+	if r, ok := c.Locals("user_role").(string); ok {
+		role = r
+	} else {
+		role = "User"
+	}
+	fmt.Printf("Locals: %v\n", c.Locals("jwt"))
 	laboratories := []models.Laboratory{}
 	articles := []models.Article{}
 	logos := []models.Logo{}
 	database.DB.Db.Find(&laboratories)
 	database.DB.Db.Find(&articles)
 	database.DB.Db.Find(&logos)
-
+	fmt.Println(role)
 	return c.Render("index", fiber.Map{
 		"Laboratories": laboratories,
 		"Articles":     articles,
 		"Logos":        logos,
+		"Role":         role,
 	})
 }
 
@@ -58,20 +67,27 @@ func AuthMain(c *fiber.Ctx) error {
 	return c.Redirect(url)
 }
 
-func AuthHome(c *fiber.Ctx) error {
-	laboratories := []models.Laboratory{}
-	articles := []models.Article{}
-	logos := []models.Logo{}
-	database.DB.Db.Find(&laboratories)
-	database.DB.Db.Find(&articles)
-	database.DB.Db.Find(&logos)
-
-	return c.Render("auth_index", fiber.Map{
-		"Laboratories": laboratories,
-		"Articles":     articles,
-		"Logos":        logos,
-	})
-}
+//func AuthHome(c *fiber.Ctx) error {
+//	var role string
+//	if r, ok := c.Locals("user_role").(string); ok {
+//		role = r
+//	} else {
+//		role = "User"
+//	}
+//	laboratories := []models.Laboratory{}
+//	articles := []models.Article{}
+//	logos := []models.Logo{}
+//	database.DB.Db.Find(&laboratories)
+//	database.DB.Db.Find(&articles)
+//	database.DB.Db.Find(&logos)
+//	fmt.Println(role)
+//
+//	return c.Render("index", fiber.Map{
+//		"Laboratories": laboratories,
+//		"Articles":     articles,
+//		"Logos":        logos,
+//	})
+//}
 
 func AuthCallback(c *fiber.Ctx) error {
 	code := c.Query("code")
@@ -90,9 +106,15 @@ func AuthCallback(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	return c.JSON(fiber.Map{
-		"token": jwtToken,
+
+	c.Cookie(&fiber.Cookie{
+		Name:     "jwt",
+		Value:    jwtToken,
+		Expires:  time.Now().Add(time.Hour * 24),
+		HTTPOnly: true,
 	})
+	//fmt.Println("c.Locals('jwt'):", c.Locals("jwt"))
+	return c.Redirect("/")
 }
 
 type Claims struct {
@@ -185,8 +207,15 @@ func CreateArticle(c *fiber.Ctx) error {
 }
 
 func ShowArticle(c *fiber.Ctx) error {
+	var role string
+	if r, ok := c.Locals("user_role").(string); ok {
+		role = r
+	} else {
+		role = "User"
+	}
 	article := models.Article{}
 	photos := []models.Photo{}
+
 	id := c.Params("id")
 
 	result := database.DB.Db.Where("id=?", id).First(&article)
@@ -202,6 +231,7 @@ func ShowArticle(c *fiber.Ctx) error {
 		"Title":   "Article",
 		"Article": article,
 		"Photos":  photos,
+		"Role":    role,
 	})
 }
 
@@ -431,6 +461,6 @@ func NotFound(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusNotFound).SendFile("views/404.html")
 }
 
-func NotModerator(c *fiber.Ctx) error {
-	return c.Status(fiber.StatusNotFound).SendFile("views/not_moderator.html")
-}
+//func NotModerator(c *fiber.Ctx) error {
+//	return c.Status(fiber.StatusNotFound).SendFile("views/not_moderator.html")
+//}
