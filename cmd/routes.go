@@ -11,7 +11,6 @@ func setupRoutes(app *fiber.App) {
 	app.Get("/article/new", handlers.NewArticleView)
 	app.Post("/laboratory", handlers.CreateLaboratory)
 	app.Post("/article", handlers.CreateArticle)
-	app.Get("/article/auth/:id", handlers.AuthShowArticle)
 	app.Get("/laboratory/:id", handlers.ShowLaboratory)
 	app.Get("/article/:id/edit", handlers.EditArticle)
 	app.Patch("/article/:id", handlers.UpdateArticle)
@@ -34,6 +33,8 @@ func setupRoutes(app *fiber.App) {
 	app.Use(middleware.AuthMiddleware())
 	app.Get("/", handlers.Home)
 	app.Get("/article/:id", handlers.ShowArticle)
+
+	app.Get("/logout", handlers.Logout)
 	//app.Get("/", handlers.AuthHome)
 
 }

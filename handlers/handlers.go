@@ -46,7 +46,6 @@ func Home(c *fiber.Ctx) error {
 	} else {
 		role = "User"
 	}
-	fmt.Printf("Locals: %v\n", c.Locals("jwt"))
 	laboratories := []models.Laboratory{}
 	articles := []models.Article{}
 	logos := []models.Logo{}
@@ -64,7 +63,12 @@ func Home(c *fiber.Ctx) error {
 
 func AuthMain(c *fiber.Ctx) error {
 	url := oauth2Config.AuthCodeURL("state", oauth2.AccessTypeOffline)
-	return c.Redirect(url)
+	fmt.Println(url)
+	err := c.Redirect(url)
+	if err != nil {
+		fmt.Println("Error while redirecting:", err)
+	}
+	return nil
 }
 
 //func AuthHome(c *fiber.Ctx) error {
@@ -100,6 +104,7 @@ func AuthCallback(c *fiber.Ctx) error {
 	}
 	if err := database.DB.RedisClient.Set(context.Background(), "refresh_token", token.RefreshToken,
 		time.Duration(time.Now().Add(time.Hour*24*3).Unix())).Err(); err != nil {
+		fmt.Println("Error saving refresh token to Redis:", err)
 		return fiber.NewError(http.StatusBadRequest, "Failed to save refresh token to Redis")
 	}
 	jwtToken, err := generateJWT(token)
@@ -166,6 +171,19 @@ func generateJWT(token *oauth2.Token) (string, error) {
 		return "", err
 	}
 	return signedToken, nil
+}
+
+func Logout(c *fiber.Ctx) error {
+	c.Cookie(&fiber.Cookie{
+		Name:     "jwt",
+		Value:    "",
+		Expires:  time.Now(),
+		HTTPOnly: true,
+	})
+
+	c.Locals("user_role", nil)
+
+	return c.Redirect("/")
 }
 
 func NewLaboratoryView(c *fiber.Ctx) error {
@@ -235,26 +253,26 @@ func ShowArticle(c *fiber.Ctx) error {
 	})
 }
 
-func AuthShowArticle(c *fiber.Ctx) error {
-	article := models.Article{}
-	photos := []models.Photo{}
-	id := c.Params("id")
-
-	result := database.DB.Db.Where("id=?", id).First(&article)
-	if result.Error != nil {
-		return NotFound(c)
-	}
-	images := database.DB.Db.Where("article_id=?", id).Find(&photos)
-	if images.Error != nil {
-		return NotFound(c)
-	}
-
-	return c.Render("article/auth_show", fiber.Map{
-		"Title":   "Article",
-		"Article": article,
-		"Photos":  photos,
-	})
-}
+//func AuthShowArticle(c *fiber.Ctx) error {
+//	article := models.Article{}
+//	photos := []models.Photo{}
+//	id := c.Params("id")
+//
+//	result := database.DB.Db.Where("id=?", id).First(&article)
+//	if result.Error != nil {
+//		return NotFound(c)
+//	}
+//	images := database.DB.Db.Where("article_id=?", id).Find(&photos)
+//	if images.Error != nil {
+//		return NotFound(c)
+//	}
+//
+//	return c.Render("article/auth_show", fiber.Map{
+//		"Title":   "Article",
+//		"Article": article,
+//		"Photos":  photos,
+//	})
+//}
 
 func ShowLaboratory(c *fiber.Ctx) error {
 	laboratory := models.Laboratory{}
