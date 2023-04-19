@@ -1,3 +1,5 @@
 *.env
 *.idea
+server.crt
+server.key
 go.mod
