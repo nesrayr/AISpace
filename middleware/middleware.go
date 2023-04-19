@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gofiber/fiber/v2"
-	"github.com/nesrayr/handlers"
+	"github.com/nesrayr/cmd/handlers"
 	"os"
 )
 

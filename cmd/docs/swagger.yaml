@@ -1,0 +1,435 @@
+basePath: /
+host: localhost:3000
+info:
+  contact:
+    email: fiber@swagger.io
+    name: API Support
+  description: This is a sample swagger for Fiber
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: AISpace
+  version: "1.0"
+paths:
+  /article:
+    post:
+      consumes:
+      - application/json
+      description: Create a new article
+      parameters:
+      - description: Title
+        in: body
+        name: title
+        required: true
+        schema:
+          type: string
+      - description: Description
+        in: body
+        name: description
+        required: true
+        schema:
+          type: string
+      produces:
+      - text/html
+      responses:
+        "200":
+          description: OK
+      summary: Create a new article
+      tags:
+      - Article
+  /article/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete article by given ID.
+      parameters:
+      - description: Article ID
+        in: body
+        name: id
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ok
+          schema:
+            type: string
+      summary: delete article by given ID
+      tags:
+      - Article
+    get:
+      consumes:
+      - application/json
+      description: Get article by given ID.
+      parameters:
+      - description: Article ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: get article by given ID
+      tags:
+      - Article
+    patch:
+      consumes:
+      - application/json
+      description: Update article.
+      parameters:
+      - description: Article ID
+        in: body
+        name: id
+        required: true
+        schema:
+          type: string
+      - description: Title
+        in: body
+        name: title
+        required: true
+        schema:
+          type: string
+      - description: Description
+        in: body
+        name: description
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: ok
+          schema:
+            type: string
+      summary: update article
+      tags:
+      - Article
+  /article/{id}/edit:
+    patch:
+      consumes:
+      - application/json
+      description: Form of updating article.
+      parameters:
+      - description: Article ID
+        in: body
+        name: id
+        required: true
+        schema:
+          type: string
+      - description: Title
+        in: body
+        name: title
+        required: true
+        schema:
+          type: string
+      - description: Description
+        in: body
+        name: description
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+      summary: Form of updating article
+      tags:
+      - Article
+  /article/new:
+    get:
+      consumes:
+      - application/json
+      description: Get the new article form
+      produces:
+      - text/html
+      responses:
+        "200":
+          description: OK
+      summary: get the new article form
+      tags:
+      - Article
+  /image/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete image by given ID.
+      parameters:
+      - description: Image ID
+        in: body
+        name: id
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ok
+          schema:
+            type: string
+      summary: delete image by given ID
+      tags:
+      - Image
+  /image/new:
+    post:
+      consumes:
+      - application/json
+      description: Create a new image.
+      parameters:
+      - description: Data
+        in: body
+        name: data
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: create a new image
+      tags:
+      - Image
+  /images:
+    get:
+      consumes:
+      - application/json
+      description: Get all exists images.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: get all exists images
+      tags:
+      - Image
+  /laboratory:
+    post:
+      consumes:
+      - application/json
+      description: Create a new laboratory
+      parameters:
+      - description: Info
+        in: body
+        name: info
+        required: true
+        schema:
+          type: string
+      produces:
+      - text/html
+      responses:
+        "200":
+          description: OK
+      summary: Create a new laboratory
+      tags:
+      - Laboratory
+  /laboratory/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get laboratory by given ID.
+      parameters:
+      - description: Article ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: get laboratory by given ID
+      tags:
+      - Laboratory
+    patch:
+      consumes:
+      - application/json
+      description: Update laboratory.
+      parameters:
+      - description: Laboratory ID
+        in: body
+        name: id
+        required: true
+        schema:
+          type: string
+      - description: Info
+        in: body
+        name: info
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: ok
+          schema:
+            type: string
+      summary: update laboratory
+      tags:
+      - Laboratory
+  /laboratory/{id}/edit:
+    patch:
+      consumes:
+      - application/json
+      description: Form of updating laboratory.
+      parameters:
+      - description: Article ID
+        in: body
+        name: id
+        required: true
+        schema:
+          type: string
+      - description: Info
+        in: body
+        name: info
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+      summary: Form of updating article
+      tags:
+      - Laboratory
+  /laboratory/new:
+    get:
+      consumes:
+      - application/json
+      description: Get the new laboratory form
+      produces:
+      - text/html
+      responses:
+        "200":
+          description: OK
+      summary: get the new laboratory form
+      tags:
+      - Laboratory
+  /logo/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete logo by given ID.
+      parameters:
+      - description: Logo ID
+        in: body
+        name: id
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ok
+          schema:
+            type: string
+      summary: delete logo by given ID
+      tags:
+      - Logo
+  /logo/new:
+    post:
+      consumes:
+      - application/json
+      description: Create a new logo.
+      parameters:
+      - description: Data
+        in: body
+        name: data
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: create a new logo
+      tags:
+      - Logo
+  /logos:
+    get:
+      consumes:
+      - application/json
+      description: Get all exists logos.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: get all exists logos
+      tags:
+      - Logo
+  /user/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete admin by given ID.
+      parameters:
+      - description: Admin ID
+        in: body
+        name: id
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: ok
+          schema:
+            type: string
+      summary: delete admin by given ID
+      tags:
+      - Admin
+  /user/new:
+    post:
+      consumes:
+      - application/json
+      description: Create a new admin.
+      parameters:
+      - description: Email
+        in: body
+        name: email
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: create a new admin
+      tags:
+      - Admin
+  /users:
+    get:
+      consumes:
+      - application/json
+      description: Get all exists users.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: get all exists users
+      tags:
+      - Admin
+schemes:
+- https
+swagger: "2.0"
